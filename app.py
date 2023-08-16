@@ -1,22 +1,22 @@
 import streamlit as st 
-from pandasai.llm.openai import OpenAI
+from langchain import OpenAI 
 from dotenv import load_dotenv
 import os
 import pandas as pd
 from pandasai import PandasAI
+from langchain.agents import create_pandas_dataframe_agent
 
 load_dotenv()
 
-
-#openai_api_key = os.getenv("OPENAI_API_KEY")
-
-OPENAI_API_KEY = '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'
+OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
 
 def chat_with_csv(df, query):
-    llm = OpenAI(api_token=OPENAI_API_KEY, temperature = 0.1)
-    pandas_ai = PandasAI(llm)
-    result = pandas_ai.run(df, prompt=query)
-    print(result)
+    llm = OpenAI(openai_api_key=OPENAI_API_KEY, temperature = 0.1)
+    agent = create_pandas_dataframe_agent(
+            llm=llm, 
+            df=df, 
+            verbose=True)
+    result = agent.run(query)
     return result
 
 st.set_page_config(layout='wide')
