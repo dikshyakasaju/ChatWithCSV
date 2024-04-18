@@ -1,22 +1,26 @@
 import streamlit as st 
-from langchain import OpenAI 
+from langchain_google_genai import ChatGoogleGenerativeAI
 from dotenv import load_dotenv
 import os
 import pandas as pd
 from pandasai import PandasAI
-from langchain.agents import create_pandas_dataframe_agent
+from langchain.agents.agent_types import AgentType
+from langchain_experimental.agents.agent_toolkits import create_pandas_dataframe_agent
 
 load_dotenv()
 
-OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
+#OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
+os.environ["GOOGLE_API_KEY"] = 'AIzaSyBVJuJ0MVmsfsFT_zcvKoIIV527-A7qzoU'
 
 def chat_with_csv(df, query):
-    llm = OpenAI(openai_api_key=OPENAI_API_KEY, temperature = 0.1)
+    llm = ChatGoogleGenerativeAI(model="gemini-pro",
+                             temperature=0.7)
     agent = create_pandas_dataframe_agent(
-            llm=llm, 
-            df=df, 
-            verbose=True)
-    result = agent.run(query)
+                                llm, 
+                                df, 
+                                verbose=True
+                                )
+    result = agent.invoke(query)
     return result
 
 st.set_page_config(layout='wide')
